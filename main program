@@ -1,0 +1,305 @@
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <fstream>
+using namespace std;
+
+
+//       PROBLEM 2
+string inclusive_speech(string sentence){
+    vector<string>pn={"he", "him", "himself", "his","He", "Him", "Himself", "His"};
+    vector<string>replace= {"he or she", "him or her", "himself or herself", "his or hers","He or she", "Him or her", "Himself or herself", "His or hers"};
+    stringstream s(sentence);
+    string wrd,res;
+    while (s>>wrd){
+        int replaced=0;
+        for(int i=0;i<8;i++){
+            if (wrd==pn[i]){
+                res+=replace[i]+" ";
+                replaced=1;
+                break;
+            }
+        }
+        if(replaced==0){
+            res+=wrd+" ";
+        }
+    }
+    return res;
+}
+void menu2(){
+    string sentence;
+    cout<<"type a sentence : "<<endl;
+    cin.ignore();
+    getline(cin,sentence);
+    string sen = inclusive_speech(sentence);
+    cout<<sen;
+}
+
+
+//       PROBLEM 5
+
+void add_plyrs(multimap<int ,string>& p_list,int score,string &name){
+    p_list.insert({score,name});
+    if(p_list.size()>10){
+        auto smallest=p_list.begin();
+        for(auto t =p_list.begin();t!=p_list.end();t++){
+            if(t->first< smallest->first){
+                smallest=t;
+            }
+
+        } p_list.erase(smallest); }
+}
+
+void prnt_top10(multimap<int ,string>& p_list){
+    int count=0;
+    cout<<"-----------------------------------------\n";
+    cout<<"            TOP 10 PLAYERS                \n";
+    cout<<"-----------------------------------------\n";
+
+    for(auto i=p_list.rbegin();i!=p_list.rend();i++){
+        count++;
+        cout<<"player : "<<i->second <<"  "<<"score : "<<i->first<<endl;
+        if(count==10){
+            break;
+        }
+    }
+    cout<<"-----------------------------------------\n";
+
+}
+
+void highest_scr(multimap<int ,string>& p_list,string &name){
+    int highest=-1;
+    for(auto t =p_list.begin();t!=p_list.end();t++){
+        if(t->second==name){
+            highest=max(highest,t->first);
+        }
+    }
+    if(highest==-1){
+        cout<<"player "<<name<<" is not found in the top 10 scores\n";
+    }
+    else {
+        cout<<"player :"<<name <<", highest score  :"<<highest<<"\n";
+    }
+
+}
+
+int menu4(){
+    int c;
+    string name;
+    int score;
+    multimap<int ,string>p_list;
+    while(true){
+        cout<<"---------------menu--------------\n";
+        cout<<" 0- exit\n";
+        cout<<" 1- add a new player and his score \n";
+        cout<<" 2- find a player's highest score \n";
+        cout<<" 3- print top 10 \n";
+        cin>>c;
+        if(c==0){
+            cout<<"end program";
+            return 0;
+        }
+        else if(c==1){
+            cout<<"please enter the player's name\n";
+            cin>>name;
+            cout<<"please enter the player's score\n";
+            cin>>score;
+            add_plyrs(p_list, score,name);
+        }
+        else if(c==2){
+            cout<<"please enter the player's name\n";
+            cin>>name;
+            highest_scr(p_list,name);
+        }
+        else if (c==3){
+            prnt_top10(p_list);
+
+        }
+        else{
+            cout<<"Invalid choice ,please try again\n";}
+    }
+}
+
+
+//     PROBLEM 8
+void spc(int s){
+    for(int i=0;i<s;i++){
+        cout<<" ";
+    }
+}
+void fractal_pttrn(int n,int s){
+    if(n==1){
+        spc(s);
+        cout<<"*"<<endl;
+        return;
+    }
+    if((n > 0 && (n & (n - 1)) == 0)){
+    fractal_pttrn(n/2,s);
+    spc(s);
+    for(int i=0;i<n/2;i++){
+        cout<<"* * ";
+    }
+    cout<<endl;
+    fractal_pttrn(n/2,s+n);}
+    else {
+        cout<<"Invalid input,the first number has to be powers of 2 and greater than zero";
+    }
+}
+
+//     PROBLEM 11
+
+void char_by_char(string f, string ff){
+    char c1,c2;
+    ifstream f1(f),f2(ff);
+    int line=1,flag =0,p=0;
+    if(f1.fail()){
+        cout<<"Error opening the first file.\n";
+        return;
+    }
+    if(f2.fail()){
+        cout<<"Error opening the second file.\n";
+        return;
+    }
+    while(f1.get(c1)&&f2.get(c2)){
+        p++;
+        if(c1=='\n'){
+            line++;
+            p=0;
+        }
+        if(c1!=c2){
+            cout << "===================================\n";
+            cout<<"Files differ at:\n";
+            cout<<"Character from first file: '" << c1 << "'\n";
+            cout<<"Character from second file: '" << c2 << "'\n";
+            cout<<"Line number: " << line << "\n";
+            cout<<"Position in line: " << p << "\n";
+            cout << "===================================\n";
+            flag=1;
+            return;
+        }
+    }
+    if ((f1.get(c1) || f2.get(c2)) && flag == 0) {
+        cout << "Files have different lengths.\n";
+        return;
+    }
+    if (flag==0){
+        cout<<"Files are identical.\n";
+    }
+    f1.close();
+    f2.close();
+}
+
+void wrd_by_wrd(string f,string ff){
+    ifstream f1,f2;
+    string wrd1,wrd2;
+    int line = 1, flag = 0;
+    f1.open(f);
+    f2.open(ff);
+    if(f1.fail()){
+        cout<<"Error opening the first file.\n";
+        return;
+    }
+    if(f2.fail()){
+        cout<<"Error opening the second file.\n";
+        return;
+    }
+    while(f1 >> wrd1 && f2 >> wrd2){
+        if(wrd1 != wrd2){
+            cout << "===================================\n";
+            cout << "Files differ at:\n";
+            cout << "Word from first file: '" << wrd1 << "'\n";
+            cout << "Word from second file: '" << wrd2 << "'\n";
+            cout << "Line number: " << line << "\n";
+            cout << "===================================\n";
+            flag = 1;
+            return;
+        }
+        if (wrd1.find('\n') != string::npos || wrd2.find('\n') != string::npos) {
+            line++;
+        }
+    }
+    if ((f1 >> wrd1 || f2 >> wrd2) && flag == 0) {
+        cout << "Files have different lengths.\n";
+        return;
+    }
+    if(flag==0){
+        cout<<"Files are identical.\n";
+    }
+    f1.close();
+    f2.close();
+}
+
+void menu11(){
+    int n;
+    cout << "\n========= File Comparison =========\n";
+    cout<<"Choose the type of comparison: \n";
+    cout<<"1) Character by character comparison\n";
+    cout<<"2) Word by word comparison\n";
+    cout<<"0) Exit\n";
+    cout << "===================================\n";
+    cin >> n;
+
+    if(n == 0){
+        cout<<"Exiting program.\n";
+        return;
+    }
+
+    string path1, path2;
+    cout<<"Enter the FULL path of the first file: ";
+    cin >> path1;
+    cout<<"Enter the FULL path of the second file: ";
+    cin >> path2;
+
+    if(n == 1){
+        char_by_char(path1, path2);
+    } else if(n == 2){
+        wrd_by_wrd(path1, path2);
+    } else {
+        cout << "Invalid choice, please try again.\n";
+        menu11();
+    }
+}
+
+
+
+
+int main_menu(){
+    int cc;
+    cout<<endl;
+    cout<<"********************************************\n";
+    cout<<"          choose the problem \n";
+    cout<<"********************************************\n";
+    cout<<"0) Exit\n";
+    cout<<"1) Inclusive speech        (prb2)\n";
+    cout<<"2) Player's list           (prb5)\n";
+    cout<<"3) Fractal pattern         (prb8)\n";
+    cout<<"4) Files Comparison        (prb11)\n";
+    cout<<"********************************************\n";
+    cin>>cc;
+    if(cc==0){
+        cout<<" END PROGRAM ";
+        return 0;
+    }
+    else if(cc==1){
+        menu2();
+    }
+    else if(cc==2){
+        menu4();
+    }
+    else if(cc==3){
+        int nn,i;
+        cout<<"enter the size of the pattern and spaces :  ";
+        cin>>nn>>i;
+        fractal_pttrn(nn,i);
+    }
+    else if(cc==4){
+        menu11();
+    }
+    main_menu();
+}
+int main(){
+    main_menu();
+}
